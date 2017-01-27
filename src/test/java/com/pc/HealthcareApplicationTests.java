@@ -14,6 +14,8 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 
 import com.pc.entity.*;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.AmqpException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -24,7 +26,28 @@ public class HealthcareApplicationTests {
 	SQLSrvRepository sqlSrvRepository; 
 	@Autowired
 	private CustomerRepository mongoRepository;
-	
+	@Autowired 
+	private AmqpAdmin admin;
+	@Autowired 
+	private AmqpTemplate template;
+
+	@Test 
+	public void simpleProducerConsumerTest() {
+		try {
+			String sent = "Catch the rabbit! " + new java.util.Date();
+			admin.declareQueue( new Queue("healthcare") );
+ 
+			// write message
+			template.convertAndSend( sent );
+			// read message
+			String received = (String)template.receiveAndConvert();
+			System.out.println( "Msg: " + received );
+			assertEquals("simpleProducerConsumerTest: ", sent, received );
+ 
+		} catch (AmqpException e) {
+			System.out.println( "Test failed: " + e.getLocalizedMessage() );
+		}
+	}
 	@Test
 	 public void testLoadStudents() {
 	     mongoRepository.deleteAll();
