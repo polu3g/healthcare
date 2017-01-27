@@ -17,6 +17,7 @@ import com.pc.entity.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+/* pc */
 public class HealthcareApplicationTests {
 
 	@Autowired
